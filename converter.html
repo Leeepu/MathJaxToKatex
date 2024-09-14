@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formula Converter</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #inputText {
+            height: 50%;
+        }
+        #outputText {
+            height: 50%;
+        }
+        #message {
+            color: green;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>MathJAx To Katex</h1>
+    <div id="message">Converted text has been copied to clipboard.</div>
+    <textarea id="inputText" placeholder="Enter text here..."></textarea>
+    <textarea id="outputText" readonly placeholder="Converted text will appear here..."></textarea>
+    
+    <script>
+        document.getElementById('inputText').addEventListener('input', async function() {
+            const inputText = this.value;
+            let convertedText = inputText.replace(/\\\((.*?)\\\)/g, (match, p1) => `$${p1}$`);
+            convertedText = convertedText.replace(/\\\[(.*?)\\\]/gs, (match, p1) => `$$${p1}$$`);
+            document.getElementById('outputText').value = convertedText;
+
+            try {
+                // 使用 document.execCommand 复制转换后的文本到剪贴板
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = convertedText;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+
+                // 显示提示消息
+                const messageDiv = document.getElementById('message');
+                messageDiv.style.display = 'block';
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';            
+                    this.value = '';
+                }, 1000); // 1秒后隐藏提示消息
+            } catch (err) {
+                console.error('Failed to copy to clipboard: ', err);
+            }
+
+        });
+    </script>
+</body>
+</html>
